@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/auth-context'
 import { FileText, Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/context/theme-context'
@@ -11,15 +11,20 @@ export default function RegisterPage() {
   const router = useRouter()
   const { register, isAuthenticated } = useAuth()
   const { isDark, setTheme } = useTheme()
-  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard')
+    }
+  }, [isAuthenticated, router])
+
   if (isAuthenticated) {
-    router.push('/dashboard')
     return null
   }
 
@@ -40,7 +45,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await register(email, password, name)
+      await register(username, password, email)
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
@@ -89,14 +94,14 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              {/* Name Input */}
+              {/* Username Input */}
               <div className="space-y-2">
-                <label className="text-sm font-semibold">Full Name</label>
+                <label className="text-sm font-semibold">Username</label>
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="johndoe"
                   className="w-full rounded-lg border border-input bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   required
                 />

@@ -2,73 +2,57 @@
 
 import Link from 'next/link'
 import {
+  Combine,
+  RotateCw,
+  ArrowUpDown,
+  Lock,
+  Image as ImageIcon,
   FileText,
-  Zap,
-  ShieldCheck,
-  TrendingUp,
+  Table,
+  Presentation,
+  FileOutput,
   ArrowRight,
+  Loader2
 } from 'lucide-react'
+import { useServices } from '@/context/services-context'
+import { SERVICE_METADATA } from '@/lib/api'
 
-const services = [
-  {
-    id: 'merge',
-    title: 'Merge PDFs',
-    description: 'Combine multiple PDF files into one seamless document',
-    features: [
-      'Drag and drop ordering',
-      'Batch processing',
-      'Maintain original formatting',
-      'Preview before merge',
-    ],
-    icon: FileText,
-    href: '/dashboard/merge',
-    color: 'from-blue-500 to-blue-600',
-  },
-  {
-    id: 'compress',
-    title: 'Compress PDFs',
-    description: 'Reduce file size while maintaining quality',
-    features: [
-      'Multiple compression levels',
-      'Batch compression',
-      'Quality preview',
-      'File size estimation',
-    ],
-    icon: Zap,
-    href: '/dashboard/compress',
-    color: 'from-amber-500 to-amber-600',
-  },
-  {
-    id: 'split',
-    title: 'Split PDFs',
-    description: 'Extract and separate pages from your documents',
-    features: [
-      'Select specific pages',
-      'Range extraction',
-      'Batch splitting',
-      'Custom naming',
-    ],
-    icon: ShieldCheck,
-    href: '/dashboard/split',
-    color: 'from-green-500 to-green-600',
-  },
-  {
-    id: 'convert',
-    title: 'Convert PDFs',
-    description: 'Transform PDFs to images and vice versa',
-    features: [
-      'PDF to JPG/PNG',
-      'Image to PDF',
-      'Batch conversion',
-      'DPI settings',
-    ],
-    icon: TrendingUp,
-    href: '/dashboard/convert',
-    color: 'from-purple-500 to-purple-600',
-  },
-]
+const iconMap: Record<string, any> = {
+  Combine,
+  RotateCw,
+  ArrowUpDown,
+  Lock,
+  Image: ImageIcon,
+  FileText,
+  Table,
+  Presentation,
+  FileOutput,
+}
 
 export default function ServicesPage() {
+  const { services, loading, error } = useServices()
+
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+          {error}
+        </div>
+      </div>
+    )
+  }
+
+  const manipulationServices = services.filter(s => SERVICE_METADATA[s.name]?.category === 'manipulation')
+  const conversionServices = services.filter(s => SERVICE_METADATA[s.name]?.category === 'conversion')
+
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -77,56 +61,139 @@ export default function ServicesPage() {
           PDF Services
         </h1>
         <p className="text-muted-foreground">
-          Explore all available PDF transformation tools
+          Explore all available PDF transformation tools fetched directly from the API
         </p>
       </div>
 
-      {/* Services Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {services.map((service) => {
-          const Icon = service.icon
-          return (
-            <div
-              key={service.id}
-              className="flex flex-col rounded-2xl border border-border bg-card p-8 hover:border-primary/50 transition-all hover:shadow-lg"
-            >
-              {/* Header */}
-              <div className="mb-4 flex items-start justify-between">
-                <div className={`inline-block rounded-xl bg-gradient-to-br ${service.color} p-3`}>
-                  <Icon size={28} className="text-white" />
-                </div>
-              </div>
+      {/* Manipulation Services */}
+      {manipulationServices.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-1 w-1 rounded-full bg-primary" />
+            <h2 className="text-xl font-bold">PDF Manipulation</h2>
+            <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-semibold text-primary">
+              {manipulationServices.length} tools
+            </span>
+          </div>
 
-              {/* Content */}
-              <h3 className="mb-2 text-xl font-bold">{service.title}</h3>
-              <p className="mb-6 text-muted-foreground">
-                {service.description}
-              </p>
-
-              {/* Features */}
-              <div className="mb-6 space-y-2">
-                {service.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    {feature}
-                  </div>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div className="mt-auto">
-                <Link
-                  href={service.href}
-                  className={`inline-flex items-center gap-2 rounded-lg bg-gradient-to-r ${service.color} px-6 py-2 font-semibold text-white hover:shadow-lg transition-all hover:scale-105`}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {manipulationServices.map((service) => {
+              const meta = SERVICE_METADATA[service.name]
+              if (!meta) return null
+              const Icon = iconMap[meta.icon] || FileText
+              
+              return (
+                <div
+                  key={service.id}
+                  className="flex flex-col rounded-2xl border border-border bg-card p-8 hover:border-primary/50 transition-all hover:shadow-lg"
                 >
-                  Get Started
-                  <ArrowRight size={18} />
-                </Link>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+                  {/* Header */}
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className={`inline-block rounded-xl bg-gradient-to-br ${meta.color} p-3`}>
+                      <Icon size={28} className="text-white" />
+                    </div>
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground capitalize">
+                      {meta.category}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="mb-2 text-xl font-bold">{meta.title}</h3>
+                  <p className="mb-6 text-muted-foreground">
+                    {service.description}
+                  </p>
+
+                  {/* Features */}
+                  <div className="mb-6 space-y-2">
+                    {meta.features.map((feature, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm">
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="mt-auto">
+                    <Link
+                      href={meta.href}
+                      className={`inline-flex items-center gap-2 rounded-lg bg-gradient-to-r ${meta.color} px-6 py-2 font-semibold text-white hover:shadow-lg transition-all hover:scale-105`}
+                    >
+                      Get Started
+                      <ArrowRight size={18} />
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Conversion Services */}
+      {conversionServices.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-1 w-1 rounded-full bg-accent" />
+            <h2 className="text-xl font-bold">PDF Conversion</h2>
+            <span className="rounded-full bg-accent/10 px-3 py-0.5 text-xs font-semibold text-accent">
+              {conversionServices.length} tools
+            </span>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {conversionServices.map((service) => {
+              const meta = SERVICE_METADATA[service.name]
+              if (!meta) return null
+              const Icon = iconMap[meta.icon] || FileText
+              
+              return (
+                <div
+                  key={service.id}
+                  className="flex flex-col rounded-2xl border border-border bg-card p-8 hover:border-primary/50 transition-all hover:shadow-lg"
+                >
+                  {/* Header */}
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className={`inline-block rounded-xl bg-gradient-to-br ${meta.color} p-3`}>
+                      <Icon size={28} className="text-white" />
+                    </div>
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground capitalize">
+                      {meta.category}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="mb-2 text-xl font-bold">{meta.title}</h3>
+                  <p className="mb-6 text-muted-foreground">
+                    {service.description}
+                  </p>
+
+                  {/* Features */}
+                  <div className="mb-6 space-y-2">
+                    {meta.features.map((feature, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm">
+                        <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="mt-auto">
+                    <Link
+                      href={meta.href}
+                      className={`inline-flex items-center gap-2 rounded-lg bg-gradient-to-r ${meta.color} px-6 py-2 font-semibold text-white hover:shadow-lg transition-all hover:scale-105`}
+                    >
+                      Get Started
+                      <ArrowRight size={18} />
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Info Section */}
       <div className="space-y-4 rounded-xl border border-border bg-card p-8">
@@ -140,13 +207,13 @@ export default function ServicesPage() {
             },
             {
               step: '2',
-              title: 'Configure',
-              description: 'Set your preferences and options',
+              title: 'Process',
+              description: 'Our server handles the processing securely',
             },
             {
               step: '3',
               title: 'Download',
-              description: 'Get your processed files instantly',
+              description: 'Get your processed files via download link',
             },
           ].map((item) => (
             <div key={item.step} className="space-y-2">

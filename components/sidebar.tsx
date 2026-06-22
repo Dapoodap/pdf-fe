@@ -3,17 +3,17 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  FileText,
   Home,
   Settings,
   LogOut,
   Menu,
   X,
-  Zap,
   History,
   FileJson,
   Moon,
   Sun,
+  LayoutGrid,
+  CreditCard,
 } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import { useTheme } from '@/context/theme-context'
@@ -33,9 +33,9 @@ export function Sidebar() {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/dashboard/services', label: 'Services', icon: FileText },
-    { href: '/dashboard/merge', label: 'Merge PDFs', icon: Zap },
+    { href: '/dashboard/services', label: 'Services', icon: LayoutGrid },
     { href: '/dashboard/history', label: 'History', icon: History },
+    { href: '/dashboard/payment', label: 'Pricing / Upgrade', icon: CreditCard },
     { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   ]
 
@@ -102,13 +102,9 @@ export function Sidebar() {
             {/* User Info */}
             <div className="mb-4 rounded-lg bg-sidebar-accent/20 p-3">
               <p className="text-xs font-semibold text-sidebar-foreground">
-                {user?.name}
+                {user?.username}
               </p>
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
-              <div className="mt-2 flex items-center gap-1 text-xs font-semibold text-sidebar-primary">
-                <Zap size={14} />
-                {user?.credits} Credits
-              </div>
+              <p className="text-xs text-muted-foreground">{user?.email || 'No email'}</p>
             </div>
 
             {/* Theme Toggle */}

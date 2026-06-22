@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Bell, Lock, User, CreditCard, ArrowLeft } from 'lucide-react'
+import { Bell, Lock, User, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import Link from 'next/link'
 
 export default function SettingsPage() {
   const { user, logout } = useAuth()
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'billing'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications'>('profile')
   const [saved, setSaved] = useState(false)
 
   const handleSave = () => {
@@ -38,7 +38,6 @@ export default function SettingsPage() {
               { id: 'profile', label: 'Profile', icon: User },
               { id: 'security', label: 'Security', icon: Lock },
               { id: 'notifications', label: 'Notifications', icon: Bell },
-              { id: 'billing', label: 'Billing', icon: CreditCard },
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -69,14 +68,16 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-6 border-t border-border pt-6">
-                {/* Full Name */}
+                {/* Username */}
                 <div className="space-y-2">
-                  <label className="font-semibold">Full Name</label>
+                  <label className="font-semibold">Username</label>
                   <input
                     type="text"
-                    defaultValue={user?.name}
-                    className="w-full rounded-lg border border-input bg-background px-4 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    defaultValue={user?.username}
+                    disabled
+                    className="w-full rounded-lg border border-input bg-muted/50 px-4 py-2 text-foreground"
                   />
+                  <p className="text-xs text-muted-foreground">Username cannot be changed</p>
                 </div>
 
                 {/* Email */}
@@ -89,17 +90,11 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                {/* Plan */}
+                {/* User ID */}
                 <div className="space-y-2">
-                  <label className="font-semibold">Current Plan</label>
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-3">
-                    <span className="capitalize font-semibold">{user?.plan} Plan</span>
-                    <Link
-                      href="/dashboard/payment"
-                      className="text-sm font-semibold text-primary hover:underline"
-                    >
-                      Upgrade
-                    </Link>
+                  <label className="font-semibold">User ID</label>
+                  <div className="flex items-center rounded-lg border border-border bg-muted/50 px-4 py-3">
+                    <span className="font-mono text-sm text-muted-foreground">{user?.id}</span>
                   </div>
                 </div>
 
@@ -191,10 +186,6 @@ export default function SettingsPage() {
                     description: 'Get notified when files are processed',
                   },
                   {
-                    title: 'Credits Expiring',
-                    description: 'Alert when credits are about to expire',
-                  },
-                  {
                     title: 'New Features',
                     description: 'Stay updated with new features and updates',
                   },
@@ -224,74 +215,6 @@ export default function SettingsPage() {
               >
                 Save Preferences
               </button>
-            </div>
-          )}
-
-          {/* Billing Tab */}
-          {activeTab === 'billing' && (
-            <div className="space-y-6 rounded-xl border border-border bg-card p-8">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold">Billing & Subscription</h2>
-                <p className="text-muted-foreground">
-                  Manage your subscription and billing information
-                </p>
-              </div>
-
-              <div className="space-y-6 border-t border-border pt-6">
-                {/* Current Plan Overview */}
-                <div className="grid gap-4 sm:grid-cols-2 p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Current Plan</p>
-                    <p className="text-2xl font-bold text-primary capitalize">{user?.plan}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Status</p>
-                    <p className="text-2xl font-bold text-green-500">Active</p>
-                  </div>
-                </div>
-
-                {/* Upgrade / Manage Plan */}
-                <Link
-                  href="/dashboard/payment"
-                  className="block rounded-lg border border-primary px-6 py-3 text-center font-semibold text-primary hover:bg-primary/5 transition-colors"
-                >
-                  {user?.plan === 'free' ? 'Upgrade to Premium' : 'Manage Subscription'}
-                </Link>
-
-                {/* Payment Methods */}
-                <div>
-                  <h3 className="font-semibold mb-3">Payment Methods</h3>
-                  <div className="rounded-lg border border-border p-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold">•••• •••• •••• 4242</p>
-                      <p className="text-sm text-muted-foreground">Expires 12/26</p>
-                    </div>
-                    <button className="text-sm font-semibold text-primary hover:underline">
-                      Edit
-                    </button>
-                  </div>
-                </div>
-
-                {/* Plan Details */}
-                <div>
-                  <h3 className="font-semibold mb-3">Plan Benefits</h3>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    {user?.plan === 'free' ? (
-                      <>
-                        <p>• Up to 5 operations per day</p>
-                        <p>• Basic PDF tools</p>
-                        <p>• Email support</p>
-                      </>
-                    ) : (
-                      <>
-                        <p>• Unlimited operations per day</p>
-                        <p>• All PDF tools</p>
-                        <p>• Priority support</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
         </div>

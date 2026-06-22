@@ -13,12 +13,28 @@ import {
 } from 'lucide-react'
 import { useTheme } from '@/context/theme-context'
 import { useAuth } from '@/context/auth-context'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getPricingPlans, type PricingPlan } from '@/lib/api'
 
 export default function HomePage() {
   const { isDark, setTheme } = useTheme()
   const { isAuthenticated } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [plans, setPlans] = useState<PricingPlan[]>([])
+
+  useEffect(() => {
+    getPricingPlans().then(data => {
+      const freePlan: PricingPlan = {
+        id: 0,
+        name: 'Free',
+        price: 0,
+        plan_type: 'forever',
+        description: 'Perfect for getting started',
+        duration_days: 0,
+      } as any
+      setPlans([freePlan, ...data])
+    }).catch(console.error)
+  }, [])
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -270,64 +286,50 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 max-w-3xl mx-auto">
-            {[
-              {
-                name: 'Free',
-                price: '$0',
-                description: 'Perfect for getting started',
-                features: [
-                  'Up to 5 operations per day',
-                  'Basic PDF operations',
-                  'Up to 5 files per operation',
-                  'Email support',
-                ],
-                highlighted: false,
-              },
-              {
-                name: 'Premium',
-                price: '$9.99',
-                description: 'For power users',
-                features: [
-                  'Unlimited operations',
-                  'All PDF tools included',
-                  'Unlimited file processing',
-                  'Priority email & chat support',
-                  'Advanced features',
-                ],
-                highlighted: true,
-              },
-            ].map((plan, i) => (
+            {plans.map((plan) => {
+              const isPremium = plan.price > 0;
+              return (
               <div
-                key={i}
-                className={`relative rounded-2xl border p-8 transition-all ${
-                  plan.highlighted
-                    ? 'border-primary bg-card shadow-lg ring-2 ring-primary/20 md:col-span-2 md:max-w-2xl md:mx-auto'
+                key={plan.id}
+                className={`relative rounded-2xl border p-8 transition-all flex flex-col ${
+                  isPremium
+                    ? 'border-primary bg-card shadow-lg ring-2 ring-primary/20 scale-105 z-10'
                     : 'border-border bg-card hover:border-primary/30'
                 }`}
               >
-                {plan.highlighted && (
+                {isPremium && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
                     Most Popular
                   </div>
                 )}
-                <h3 className="text-2xl font-bold">{plan.name}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                <h3 className="text-2xl font-bold capitalize">{plan.description || plan.plan_type || 'Free'}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{isPremium ? 'For power users' : 'Perfect for getting started'}</p>
                 <div className="mt-6 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-4xl font-bold">{plan.price === 0 ? 'Free' : `$${(plan.price / 15000).toFixed(2)}`}</span>
+                  {plan.price > 0 && <span className="text-muted-foreground">/ {plan.duration_days} days</span>}
                 </div>
                 <ul className="mt-8 space-y-3">
-                  {plan.features.map((feature, j) => (
-                    <li key={j} className="flex items-center gap-2 text-sm">
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      {feature}
-                    </li>
-                  ))}
+                    {isPremium ? (
+                      <>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Unlimited operations per day</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> All PDF tools included</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Unlimited file processing size</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Merge unlimited files</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Priority email & chat support</li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Basic PDF tools</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Up to 3 files per merge</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> 100MB file size limit</li>
+                        <li className="flex items-center gap-2 text-sm"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Email support</li>
+                      </>
+                    )}
                 </ul>
                 <Link
                   href={isAuthenticated ? '/dashboard' : '/register'}
-                  className={`mt-8 block rounded-lg py-2 text-center font-semibold transition-colors ${
-                    plan.highlighted
+                  className={`mt-10 block rounded-lg py-2 text-center font-semibold transition-colors ${
+                    isPremium
                       ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                       : 'border border-primary text-primary hover:bg-primary/5'
                   }`}
@@ -335,7 +337,7 @@ export default function HomePage() {
                   Get Started
                 </Link>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>

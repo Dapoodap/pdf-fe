@@ -42,6 +42,8 @@ export const viewport: Viewport = {
   ],
 }
 
+import { ServicesProvider } from '@/context/services-context'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -51,7 +53,11 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`} suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <ServicesProvider>
+              {children}
+            </ServicesProvider>
+          </AuthProvider>
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

@@ -1,18 +1,23 @@
 'use client'
 
 import { useState } from 'react'
-import { FileUp, X, Zap, Download, GripVertical } from 'lucide-react'
-import { usePdfOperations } from '@/hooks/use-pdf-operations'
-import { useAuth } from '@/context/auth-context'
+import { FileUp, X, Download, GripVertical, ExternalLink } from 'lucide-react'
+import { mergePdfs, type ManipulationResponse } from '@/lib/api'
 import Link from 'next/link'
 
+import { useAuth } from '@/context/auth-context'
+
 export default function MergePage() {
-  const { files, processing, progress, error, handleFileSelect, removeFile, reorderFiles } = usePdfOperations()
   const { user } = useAuth()
+  const isPremium = user?.membership_status === 'premium'
+
+  const [files, setFiles] = useState<File[]>([])
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
-  const [processed, setProcessed] = useState(false)
-  const [mergedFile, setMergedFile] = useState<any>(null)
+  const [processing, setProcessing] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<ManipulationResponse | null>(null)
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -26,15 +31,53 @@ export default function MergePage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
-
-    const droppedFiles = Array.from(e.dataTransfer.files)
-    handleFileSelect(droppedFiles as File[])
+    const droppedFiles = Array.from(e.dataTransfer.files).filter(
+      (f) => f.type === 'application/pdf'
+    )
+    
+    const allFiles = [...files, ...droppedFiles]
+    if (!isPremium) {
+      if (allFiles.length > 3) {
+        setError("Free users can only merge up to 3 files. Upgrade to Premium for unlimited!")
+        return
+      }
+      for (const f of droppedFiles) {
+        if (f.size > 100 * 1024 * 1024) {
+          setError(`File ${f.name} exceeds the 100MB free limit. Please upgrade.`)
+          return
+        }
+      }
+    }
+    setFiles(allFiles)
+    setError(null)
   }
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      handleFileSelect(Array.from(e.target.files))
+      const newFiles = Array.from(e.target.files)
+      const allFiles = [...files, ...newFiles]
+      if (!isPremium) {
+        if (allFiles.length > 3) {
+          setError("Free users can only merge up to 3 files. Upgrade to Premium for unlimited!")
+          e.target.value = ''
+          return
+        }
+        for (const f of newFiles) {
+          if (f.size > 100 * 1024 * 1024) {
+            setError(`File ${f.name} exceeds the 100MB free limit. Please upgrade.`)
+            e.target.value = ''
+            return
+          }
+        }
+      }
+      setFiles(allFiles)
+      setError(null)
     }
+    e.target.value = ''
+  }
+
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index))
   }
 
   const handleDragStart = (index: number) => {
@@ -43,23 +86,38 @@ export default function MergePage() {
 
   const handleDragOverItem = (index: number) => {
     if (draggedIndex !== null && draggedIndex !== index) {
-      reorderFiles(draggedIndex, index)
+      const newFiles = Array.from(files)
+      const [removed] = newFiles.splice(draggedIndex, 1)
+      newFiles.splice(index, 0, removed)
+      setFiles(newFiles)
       setDraggedIndex(index)
     }
   }
 
   const handleMerge = async () => {
-    // Simulate processing
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 200))
-    }
+    if (files.length < 2) return
+    setProcessing(true)
+    setError(null)
+    setResult(null)
+    setProgress(10)
 
-    setMergedFile({
-      name: 'merged-pdf.pdf',
-      size: '2.5 MB',
-      id: `merged_${Date.now()}`,
-    })
-    setProcessed(true)
+    try {
+      setProgress(30)
+      const response = await mergePdfs(files)
+      setProgress(100)
+      setResult(response)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Merge failed')
+    } finally {
+      setProcessing(false)
+      setProgress(0)
+    }
+  }
+
+  const handleReset = () => {
+    setFiles([])
+    setResult(null)
+    setError(null)
   }
 
   return (
@@ -169,7 +227,7 @@ export default function MergePage() {
           )}
 
           {/* Success Result */}
-          {processed && mergedFile && (
+          {result && (
             <div className="rounded-lg border border-green-500/50 bg-green-500/10 p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <div className="rounded-full bg-green-500/20 p-2">
@@ -180,19 +238,23 @@ export default function MergePage() {
                     Merge Complete!
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {mergedFile.name} ({mergedFile.size})
+                    {result.file_name}
                   </p>
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button className="flex-1 rounded-lg bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600 transition-colors">
+                <a
+                  href={result.download_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 font-semibold text-white hover:bg-green-600 transition-colors"
+                >
+                  <Download size={18} />
                   Download File
-                </button>
+                  <ExternalLink size={14} />
+                </a>
                 <button
-                  onClick={() => {
-                    setProcessed(false)
-                    setMergedFile(null)
-                  }}
+                  onClick={handleReset}
                   className="flex-1 rounded-lg border border-green-500 px-4 py-2 font-semibold text-green-600 dark:text-green-400 hover:bg-green-500/10 transition-colors"
                 >
                   Merge More
@@ -204,24 +266,6 @@ export default function MergePage() {
 
         {/* Sidebar */}
         <div className="space-y-4">
-          {/* Credits Info */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap size={18} className="text-primary" />
-              <h3 className="font-semibold">Credits</h3>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Available:</span>
-                <span className="font-semibold">{user?.credits}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Cost per merge:</span>
-                <span className="font-semibold">5</span>
-              </div>
-            </div>
-          </div>
-
           {/* Action Button */}
           <button
             onClick={handleMerge}
@@ -237,8 +281,8 @@ export default function MergePage() {
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li>• Drag files to reorder them</li>
               <li>• Click X to remove a file</li>
+              <li>• Minimum 2 files required</li>
               <li>• Supports all PDF versions</li>
-              <li>• Maximum 10 files per merge</li>
               <li>• Merged file retains formatting</li>
             </ul>
           </div>
