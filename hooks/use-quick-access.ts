@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-const QUICK_ACCESS_KEY = 'pdfkit_quick_access'
+const QUICK_ACCESS_KEY = 'PDFKU_quick_access'
 
 export function useQuickAccess(defaultServices: string[] = []) {
   const [quickAccess, setQuickAccess] = useState<string[]>([])

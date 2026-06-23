@@ -55,7 +55,7 @@ export default function HomePage() {
 
   const faqs = [
     {
-      question: "Is PDFKit really free to use?",
+      question: "Is PDFKU really free to use?",
       answer: "Yes! You can use our basic tools completely for free as a Guest. Free users have a 100MB file size limit and can process a limited number of files per operation. For unlimited access, you can upgrade to our Premium plan."
     },
     {
@@ -64,7 +64,7 @@ export default function HomePage() {
     },
     {
       question: "Do I need to install any software?",
-      answer: "No installation is required. PDFKit is a 100% cloud-based online tool. You can access it from any web browser on Windows, Mac, Linux, or mobile devices."
+      answer: "No installation is required. PDFKU is a 100% cloud-based online tool. You can access it from any web browser on Windows, Mac, Linux, or mobile devices."
     },
     {
       question: "Can I cancel my premium subscription anytime?",
@@ -154,18 +154,18 @@ export default function HomePage() {
             </span>
             #1 Online PDF Toolkit
           </div>
-          
+
           <h1 className="mx-auto max-w-4xl text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
             Simplify Your PDF <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Workflow Today
             </span>
           </h1>
-          
+
           <p className="mx-auto mt-8 max-w-2xl text-xl text-muted-foreground leading-relaxed">
             Merge, convert, protect, and manipulate your PDF files in seconds. No complicated software to install. Fast, secure, and beautifully designed.
           </p>
-          
+
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href={isAuthenticated ? '/dashboard' : '/register'}
@@ -206,13 +206,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
-              How PDFKit Works
+              How PDFKU Works
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               Process your documents in three simple steps.
             </p>
           </div>
-          
+
           <div className="grid gap-8 md:grid-cols-3">
             <div className="relative rounded-3xl border border-border bg-card p-8 text-center shadow-sm transition-all hover:-translate-y-1 hover:border-primary/50">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-2xl font-black text-primary">1</div>
@@ -300,12 +300,12 @@ export default function HomePage() {
                   <p className={`mt-2 text-sm ${isPremium ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
                     {isPremium ? 'For power users and professionals' : 'Perfect for getting started'}
                   </p>
-                  
+
                   <div className="my-8 flex items-baseline gap-1">
                     <span className="text-5xl font-extrabold">{plan.price === 0 ? 'Free' : `Rp ${plan.price.toLocaleString('id-ID')}`}</span>
                     {plan.price > 0 && <span className={`text-lg font-medium ${isPremium ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>/ {plan.duration_days} days</span>}
                   </div>
-                  
+
                   <div className="flex-1 space-y-4">
                     {isPremium ? (
                       <>
@@ -351,8 +351,8 @@ export default function HomePage() {
           </div>
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="rounded-2xl border border-border bg-card overflow-hidden transition-all"
               >
                 <button
@@ -360,15 +360,14 @@ export default function HomePage() {
                   onClick={() => toggleFaq(index)}
                 >
                   <span className="text-lg font-semibold">{faq.question}</span>
-                  <ChevronDown 
-                    size={20} 
-                    className={`text-muted-foreground transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`} 
+                  <ChevronDown
+                    size={20}
+                    className={`text-muted-foreground transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`}
                   />
                 </button>
-                <div 
-                  className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${
-                    openFaq === index ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'
-                  }`}
+                <div
+                  className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${openFaq === index ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'
+                    }`}
                 >
                   <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                 </div>
@@ -385,7 +384,7 @@ export default function HomePage() {
             Ready to transform your documents?
           </h2>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/90">
-            Join thousands of professionals who use PDFKit every day to manage their PDF workflow efficiently.
+            Join thousands of professionals who use PDFKU every day to manage their PDF workflow efficiently.
           </p>
           <div className="mt-10 flex justify-center">
             <Link
@@ -407,13 +406,13 @@ export default function HomePage() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                   <FileText size={20} className="text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold">PDFKit</span>
+                <span className="text-xl font-bold">PDFKU</span>
               </Link>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 The ultimate toolkit to manage, convert, and edit your PDF files securely online.
               </p>
             </div>
-            
+
             <div>
               <h3 className="mb-4 font-semibold text-foreground">PDF Tools</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
@@ -444,10 +443,10 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
-          
+
           <div className="mt-16 flex flex-col items-center justify-between border-t border-border pt-8 sm:flex-row">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} PDFKit. All rights reserved.
+              © {new Date().getFullYear()} PDFKU. All rights reserved.
             </p>
             <div className="mt-4 flex space-x-4 sm:mt-0 opacity-50">
               <div className="h-5 w-5 rounded-full bg-foreground"></div>

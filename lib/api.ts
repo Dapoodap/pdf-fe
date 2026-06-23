@@ -6,15 +6,15 @@ const PROXY_BASE = '/api/proxy'
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('pdfkit_token')
+  return localStorage.getItem('PDFKU_token')
 }
 
 export function setToken(token: string): void {
-  localStorage.setItem('pdfkit_token', token)
+  localStorage.setItem('PDFKU_token', token)
 }
 
 export function removeToken(): void {
-  localStorage.removeItem('pdfkit_token')
+  localStorage.removeItem('PDFKU_token')
 }
 
 // ─── JWT Decode (simple base64 decode) ───────────────────────────────────────

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   Home,
@@ -61,19 +62,16 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 h-screen w-64 transform bg-sidebar text-sidebar-foreground shadow-lg transition-transform duration-300 md:relative md:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed left-0 top-0 z-40 h-screen w-64 transform bg-sidebar text-sidebar-foreground shadow-lg transition-transform duration-300 md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="border-b border-sidebar-border px-6 py-6">
             <Link href="/dashboard" onClick={() => setIsOpen(false)}>
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-                  <FileJson size={18} className="text-sidebar-primary-foreground" />
-                </div>
-                <h1 className="text-lg font-bold">PDFKit</h1>
+                <Image src="/logo.png" alt="PDFKU Logo" width={60} height={60} className="rounded-lg object-contain" />
+                {/* <h1 className="text-lg font-bold">PDFKU</h1> */}
               </div>
             </Link>
           </div>
@@ -85,11 +83,10 @@ export function Sidebar() {
                 key={href}
                 href={href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive(href)
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
-                }`}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive(href)
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                  }`}
               >
                 <Icon size={18} />
                 <span>{label}</span>

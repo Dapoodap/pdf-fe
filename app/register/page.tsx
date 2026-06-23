@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/auth-context'
@@ -60,10 +61,8 @@ export default function RegisterPage() {
       <nav className="border-b border-border px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <FileText size={20} className="text-primary-foreground" />
-            </div>
-            <span className="hidden text-lg font-bold sm:inline">PDFKit</span>
+            <Image src="/logo.png" alt="PDFKU Logo" width={60} height={60} className="rounded-lg object-contain" />
+            {/* <span className="hidden text-lg font-bold sm:inline">PDFKU</span> */}
           </Link>
           <button
             onClick={() => setTheme(isDark ? 'light' : 'dark')}
@@ -82,7 +81,7 @@ export default function RegisterPage() {
             <div className="text-center">
               <h1 className="text-3xl font-bold">Create Account</h1>
               <p className="mt-2 text-muted-foreground">
-                Join PDFKit and start transforming your PDFs
+                Join PDFKU and start transforming your PDFs
               </p>
             </div>
 

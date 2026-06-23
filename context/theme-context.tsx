@@ -18,7 +18,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Load theme from localStorage
-    const savedTheme = localStorage.getItem('pdfkit_theme') as Theme | null
+    const savedTheme = localStorage.getItem('PDFKU_theme') as Theme | null
     if (savedTheme) {
       setThemeState(savedTheme)
     }
@@ -53,7 +53,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme)
-    localStorage.setItem('pdfkit_theme', newTheme)
+    localStorage.setItem('PDFKU_theme', newTheme)
 
     const htmlElement = document.documentElement
     const themeToApply = newTheme === 'system' ? (

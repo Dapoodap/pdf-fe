@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { FileText, Moon, Sun, Menu, X } from 'lucide-react'
 import { useTheme } from '@/context/theme-context'
 import { useAuth } from '@/context/auth-context'
@@ -17,10 +18,8 @@ export function PublicNavbar() {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <FileText size={20} className="text-primary-foreground" />
-            </div>
-            <span className="hidden text-lg font-bold sm:inline">PDFKit</span>
+            <Image src="/logo.png" alt="PDFKU Logo" width={60} height={60} className="rounded-lg object-contain" />
+            {/* <span className="hidden text-lg font-bold sm:inline">PDFKU</span> */}
           </Link>
 
           {/* Desktop Menu */}
