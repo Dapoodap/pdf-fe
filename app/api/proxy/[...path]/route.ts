@@ -48,9 +48,9 @@ async function proxyRequest(req: NextRequest, params: { path: string[] }) {
     headers.set('authorization', authHeader)
   }
 
-  // Forward Content-Type for non-FormData requests
+  // Forward Content-Type exactly as received (including multipart boundaries)
   const contentType = req.headers.get('content-type')
-  if (contentType && !contentType.includes('multipart/form-data')) {
+  if (contentType) {
     headers.set('content-type', contentType)
   }
 
@@ -58,12 +58,8 @@ async function proxyRequest(req: NextRequest, params: { path: string[] }) {
   const method = req.method
 
   if (method !== 'GET' && method !== 'HEAD') {
-    if (contentType?.includes('multipart/form-data')) {
-      // For FormData, pass raw body without content-type so browser boundary is respected
-      body = await req.blob()
-    } else {
-      body = await req.text()
-    }
+    // Pass the raw bytes exactly as received
+    body = await req.arrayBuffer()
   }
 
   try {
