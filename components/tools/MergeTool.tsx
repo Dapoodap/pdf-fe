@@ -22,6 +22,11 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
+  const isGuest = !user
+  const sizeLimitReached = !isPremium && files.some(f => f.size > 100 * 1024 * 1024)
+  const countLimitReached = !isPremium && files.length > 3
+  const limitReached = sizeLimitReached || countLimitReached
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(true)
@@ -39,32 +44,6 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
     )
     
     const allFiles = [...files, ...droppedFiles]
-    if (!isPremium && !isGuest) {
-      if (allFiles.length > 3) {
-        setError("Free users can only merge up to 3 files. Upgrade to Premium for unlimited!")
-        return
-      }
-      for (const f of droppedFiles) {
-        if (f.size > 100 * 1024 * 1024) {
-          setError(`File ${f.name} exceeds the 100MB free limit. Please upgrade.`)
-          return
-        }
-      }
-    }
-    
-    if (isGuest) {
-        if (allFiles.length > 3) {
-            setError("Guests can only merge up to 3 files.")
-            return
-        }
-        for (const f of droppedFiles) {
-            if (f.size > 100 * 1024 * 1024) {
-              setError(`File ${f.name} exceeds the 100MB limit.`)
-              return
-            }
-        }
-    }
-
     setFiles(allFiles)
     setError(null)
   }
@@ -72,37 +51,6 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || [])
     const allFiles = [...files, ...selectedFiles]
-    
-    if (!isPremium && !isGuest) {
-      if (allFiles.length > 3) {
-        setError("Free users can only merge up to 3 files. Upgrade to Premium for unlimited!")
-        e.target.value = ''
-        return
-      }
-      for (const f of selectedFiles) {
-        if (f.size > 100 * 1024 * 1024) {
-          setError(`File ${f.name} exceeds the 100MB free limit. Please upgrade.`)
-          e.target.value = ''
-          return
-        }
-      }
-    }
-
-    if (isGuest) {
-        if (allFiles.length > 3) {
-            setError("Guests can only merge up to 3 files.")
-            e.target.value = ''
-            return
-        }
-        for (const f of selectedFiles) {
-            if (f.size > 100 * 1024 * 1024) {
-              setError(`File ${f.name} exceeds the 100MB limit.`)
-              e.target.value = ''
-              return
-            }
-        }
-    }
-
     setFiles(allFiles)
     setError(null)
   }
@@ -293,9 +241,16 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
 
         {/* Sidebar Info / CTA */}
         <div className="space-y-4">
+          {limitReached && (
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+              {sizeLimitReached 
+                ? `One or more files exceed the 100MB free limit. ${isGuest ? 'Please login and upgrade' : 'Please upgrade'} to Premium.`
+                : `Free users can only merge up to 3 files. ${isGuest ? 'Please login and upgrade' : 'Please upgrade'} to Premium for unlimited!`}
+            </div>
+          )}
           <button
             onClick={handleMerge}
-            disabled={files.length < 2 || processing}
+            disabled={files.length < 2 || processing || limitReached}
             className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
             {processing ? 'Processing...' : `Merge ${files.length} Files`}

@@ -23,6 +23,9 @@ export function LockTool({ isGuest = false }: LockToolProps) {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
+  const isGuest = !user
+  const limitReached = file ? (!isPremium && file.size > 100 * 1024 * 1024) : false
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
@@ -30,14 +33,6 @@ export function LockTool({ isGuest = false }: LockToolProps) {
       (f) => f.type === 'application/pdf'
     )
     if (dropped) {
-      if (!isPremium && !isGuest && dropped.size > 100 * 1024 * 1024) {
-        setError(`File ${dropped.name} exceeds the 100MB free limit. Please upgrade.`)
-        return
-      }
-      if (isGuest && dropped.size > 100 * 1024 * 1024) {
-        setError(`File ${dropped.name} exceeds the 100MB limit.`)
-        return
-      }
       setFile(dropped)
       setError(null)
     }
@@ -46,16 +41,6 @@ export function LockTool({ isGuest = false }: LockToolProps) {
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] || null
     if (selected) {
-      if (!isPremium && !isGuest && selected.size > 100 * 1024 * 1024) {
-        setError(`File ${selected.name} exceeds the 100MB free limit. Please upgrade.`)
-        e.target.value = ''
-        return
-      }
-      if (isGuest && selected.size > 100 * 1024 * 1024) {
-        setError(`File ${selected.name} exceeds the 100MB limit.`)
-        e.target.value = ''
-        return
-      }
       setFile(selected)
       setError(null)
     }
@@ -267,9 +252,14 @@ export function LockTool({ isGuest = false }: LockToolProps) {
 
         {/* Sidebar */}
         <div className="space-y-4">
+          {limitReached && (
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+              File exceeds the 100MB free limit. {isGuest ? 'Please login and upgrade' : 'Please upgrade'} to Premium.
+            </div>
+          )}
           <button
             onClick={handleLock}
-            disabled={!file || !password || processing}
+            disabled={!file || !password || processing || limitReached}
             className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
             {processing ? 'Encrypting...' : 'Lock PDF'}
