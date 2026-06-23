@@ -32,12 +32,10 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Fetch services when the user is authenticated (since the dashboard needs it)
+  // Fetch services immediately so guest pages can also access the list
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchServices()
-    }
-  }, [isAuthenticated])
+    fetchServices()
+  }, [])
 
   return (
     <ServicesContext.Provider value={{ services, loading, error, refreshServices: fetchServices }}>

@@ -32,9 +32,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
       if (themeToApply === 'dark') {
         htmlElement.classList.add('dark')
+        htmlElement.classList.remove('light')
         setIsDark(true)
       } else {
         htmlElement.classList.remove('dark')
+        htmlElement.classList.add('light')
         setIsDark(false)
       }
     }
@@ -60,9 +62,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     if (themeToApply === 'dark') {
       htmlElement.classList.add('dark')
+      htmlElement.classList.remove('light')
       setIsDark(true)
     } else {
       htmlElement.classList.remove('dark')
+      htmlElement.classList.add('light')
       setIsDark(false)
     }
   }

@@ -5,8 +5,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: deps
     ports:
       - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.local
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      # Server-side proxy target: host.docker.internal resolves to the host machine from inside Docker
+      - BACKEND_URL=http://host.docker.internal:8000
+    command: npm run dev
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

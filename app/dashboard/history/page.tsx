@@ -53,11 +53,10 @@ export default function HistoryPage() {
   }, [user?.id])
 
   const fetchHistory = async () => {
-    if (!user?.id) return
     setLoading(true)
     setError(null)
     try {
-      const data = await getUserHistory(user.id)
+      const data = await getUserHistory()
       setHistory(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load history')

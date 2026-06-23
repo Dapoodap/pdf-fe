@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+// All API calls go through the Next.js server-side proxy so the API key
+// is never exposed in the browser bundle.
+const PROXY_BASE = '/api/proxy'
 
 // ─── Token Helpers ───────────────────────────────────────────────────────────
 
@@ -46,6 +48,7 @@ export async function apiRequest<T = any>(
   const token = getToken()
   const requestHeaders: Record<string, string> = { ...headers }
 
+  // Bearer token is forwarded to the proxy, which injects the API key server-side
   if (token) {
     requestHeaders['Authorization'] = `Bearer ${token}`
   }
@@ -63,7 +66,9 @@ export async function apiRequest<T = any>(
     requestBody = JSON.stringify(body)
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  // Route through Next.js server-side proxy — API key injected there, not here
+  const proxyEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+  const response = await fetch(`${PROXY_BASE}${proxyEndpoint}`, {
     method,
     headers: requestHeaders,
     body: requestBody,
@@ -73,7 +78,11 @@ export async function apiRequest<T = any>(
     let errorMessage = `Request failed with status ${response.status}`
     try {
       const errorData = await response.json()
-      errorMessage = errorData.detail || errorData.message || errorMessage
+      console.error('API Error Response:', errorData)
+      errorMessage = errorData.detail || errorData.message || errorData.error || errorMessage
+      if (errorData.details) {
+        errorMessage += ` (${errorData.details})`
+      }
     } catch {
       // ignore parse error
     }
@@ -183,8 +192,8 @@ export interface DownloadUrlResponse {
   file_name: string
 }
 
-export async function getUserHistory(userId: number): Promise<HistoryItem[]> {
-  return apiRequest<HistoryItem[]>(`/history/user/${userId}`)
+export async function getUserHistory(): Promise<HistoryItem[]> {
+  return apiRequest<HistoryItem[]>('/history/me')
 }
 
 export async function getDownloadUrl(historyId: number): Promise<DownloadUrlResponse> {
@@ -333,6 +342,7 @@ export interface ServiceMetadata {
   title: string
   category: 'manipulation' | 'conversion'
   href: string
+  publicHref: string // SEO root landing page href
   icon: string // lucide icon name
   color: string // tailwind gradient
   features: string[]
@@ -343,6 +353,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'Merge PDFs',
     category: 'manipulation',
     href: '/dashboard/merge',
+    publicHref: '/merge',
     icon: 'Combine',
     color: 'from-blue-500 to-blue-600',
     features: ['Drag and drop ordering', 'Batch processing', 'Optional per-file rotation', 'Maintain formatting'],
@@ -351,6 +362,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'Rotate PDF',
     category: 'manipulation',
     href: '/dashboard/rotate',
+    publicHref: '/rotate',
     icon: 'RotateCw',
     color: 'from-emerald-500 to-emerald-600',
     features: ['Rotate 90°, 180°, or 270°', 'Select specific pages', 'Rotate all pages at once', 'Instant preview'],
@@ -359,6 +371,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'Reorder Pages',
     category: 'manipulation',
     href: '/dashboard/reorder',
+    publicHref: '/reorder',
     icon: 'ArrowUpDown',
     color: 'from-violet-500 to-violet-600',
     features: ['Custom page order', 'Extract specific pages', 'Remove unwanted pages', 'Create subsets'],
@@ -367,6 +380,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'Lock PDF',
     category: 'manipulation',
     href: '/dashboard/lock',
+    publicHref: '/lock',
     icon: 'Lock',
     color: 'from-rose-500 to-rose-600',
     features: ['Password protection', 'AES encryption', 'Secure sharing', 'Industry standard'],
@@ -375,6 +389,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'PDF to Images',
     category: 'conversion',
     href: '/dashboard/convert?type=pdf-to-images',
+    publicHref: '/pdf-to-images',
     icon: 'Image',
     color: 'from-amber-500 to-amber-600',
     features: ['High quality PNG output', 'Multi-page to ZIP', 'Single page to PNG', 'Fast conversion'],
@@ -383,6 +398,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'PDF to Word',
     category: 'conversion',
     href: '/dashboard/convert?type=pdf-to-docx',
+    publicHref: '/pdf-to-word',
     icon: 'FileText',
     color: 'from-sky-500 to-sky-600',
     features: ['Editable Word output', 'Preserve formatting', 'Table extraction', 'Image retention'],
@@ -391,6 +407,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'PDF to Excel',
     category: 'conversion',
     href: '/dashboard/convert?type=pdf-to-xlsx',
+    publicHref: '/pdf-to-excel',
     icon: 'Table',
     color: 'from-green-500 to-green-600',
     features: ['Table detection', 'Multiple sheets', 'Data accuracy', 'Formula-ready'],
@@ -399,6 +416,7 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'PDF to PowerPoint',
     category: 'conversion',
     href: '/dashboard/convert?type=pdf-to-pptx',
+    publicHref: '/pdf-to-powerpoint',
     icon: 'Presentation',
     color: 'from-orange-500 to-orange-600',
     features: ['Slide conversion', 'Layout preservation', 'Image quality', 'Editable slides'],
@@ -407,8 +425,10 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     title: 'Convert to PDF',
     category: 'conversion',
     href: '/dashboard/convert?type=to-pdf',
+    publicHref: '/to-pdf',
     icon: 'FileOutput',
     color: 'from-purple-500 to-purple-600',
     features: ['PNG, JPG, JPEG support', 'DOCX, XLSX, PPTX support', 'Quality preservation', 'Fast processing'],
   },
 }
+
