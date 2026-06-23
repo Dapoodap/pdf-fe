@@ -84,7 +84,6 @@ export function ConvertTool({ isGuest = false, initialType }: ConvertToolProps) 
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
-  const isGuest = !user
   const limitReached = file ? (!isPremium && file.size > 100 * 1024 * 1024) : false
 
   useEffect(() => {

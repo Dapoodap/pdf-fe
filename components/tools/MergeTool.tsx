@@ -22,7 +22,6 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
-  const isGuest = !user
   const sizeLimitReached = !isPremium && files.some(f => f.size > 100 * 1024 * 1024)
   const countLimitReached = !isPremium && files.length > 3
   const limitReached = sizeLimitReached || countLimitReached

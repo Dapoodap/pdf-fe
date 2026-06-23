@@ -24,7 +24,6 @@ export function RotateTool({ isGuest = false }: RotateToolProps) {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
-  const isGuest = !user
   const limitReached = file ? (!isPremium && file.size > 100 * 1024 * 1024) : false
 
   const handleDrop = (e: React.DragEvent) => {
