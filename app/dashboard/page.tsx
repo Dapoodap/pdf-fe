@@ -101,10 +101,10 @@ export default function DashboardPage() {
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 relative">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight break-words">
           Welcome back, {user?.username}!
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Transform your PDFs with our suite of powerful tools
         </p>
       </div>

@@ -81,62 +81,62 @@ export function PublicNavbar() {
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="border-t border-border pb-4 md:hidden">
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="border-t border-border pb-4 pt-2">
             <Link
               href="/#features"
-              className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="block px-4 py-3 text-base font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground active:bg-muted"
               onClick={() => setMobileMenuOpen(false)}
             >
               Features
             </Link>
             <Link
               href="/#pricing"
-              className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="block px-4 py-3 text-base font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground active:bg-muted"
               onClick={() => setMobileMenuOpen(false)}
             >
               Pricing
             </Link>
-            <div className="border-t border-border px-4 py-3">
+            <div className="border-t border-border px-4 py-4 mt-2 space-y-3">
               <button
                 onClick={() => {
                   setTheme(isDark ? 'light' : 'dark')
                   setMobileMenuOpen(false)
                 }}
-                className="mb-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium hover:bg-muted"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-base font-medium hover:bg-muted active:bg-muted/80"
               >
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                {isDark ? <Sun size={20} /> : <Moon size={20} />}
                 {isDark ? 'Light Mode' : 'Dark Mode'}
               </button>
               {isAuthenticated ? (
                 <Link
                   href="/dashboard"
-                  className="block w-full rounded-lg bg-primary px-3 py-2 text-center text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="block w-full rounded-xl bg-primary px-4 py-3 text-center text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors active:scale-[0.98]"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
               ) : (
-                <>
+                <div className="grid grid-cols-2 gap-3 pt-2">
                   <Link
                     href="/login"
-                    className="block w-full rounded-lg border border-border px-3 py-2 text-center text-sm font-semibold hover:bg-muted transition-colors mb-2"
+                    className="block w-full rounded-xl border-2 border-border px-4 py-2.5 text-center text-base font-semibold hover:bg-muted transition-colors active:scale-[0.98]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="block w-full rounded-lg bg-primary px-3 py-2 text-center text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                    className="block w-full rounded-xl bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors active:scale-[0.98]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Get Started
+                    Register
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   )

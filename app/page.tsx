@@ -97,7 +97,7 @@ export default function HomePage() {
       <PublicNavbar />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border px-4 pt-24 pb-32 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden border-b border-border px-4 pt-16 pb-24 sm:pt-24 sm:pb-32 sm:px-6 lg:px-8">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
         <div className="relative mx-auto max-w-7xl text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
@@ -108,7 +108,7 @@ export default function HomePage() {
             #1 Online PDF Toolkit
           </div>
 
-          <h1 className="mx-auto max-w-4xl text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
+          <h1 className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-8xl">
             Simplify Your PDF <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Workflow Today
@@ -138,24 +138,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof / Trust Section */}
-      <section className="border-b border-border bg-muted/30 py-12">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Trusted by professionals worldwide
+      {/* Infinite Scrolling Formats Banner */}
+      <section className="relative overflow-hidden border-b border-border bg-muted/10 py-12 sm:py-16">
+        <div className="mb-10 text-center px-4">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">
+            Trusted for all your document formats
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale sm:gap-16">
-            {/* Dummy Logos */}
-            <div className="flex items-center gap-2 text-xl font-black tracking-tighter"><ShieldCheck size={28} /> SECURECORP</div>
-            <div className="flex items-center gap-2 text-xl font-black tracking-tighter"><TrendingUp size={28} /> ANALYTICA</div>
-            <div className="flex items-center gap-2 text-xl font-black tracking-tighter"><Zap size={28} /> BOLT SYSTEMS</div>
-            <div className="flex items-center gap-2 text-xl font-black tracking-tighter"><FileText size={28} /> DOCUWORKS</div>
+        </div>
+        
+        <div className="flex w-full overflow-hidden">
+          <div className="flex w-max animate-marquee items-center gap-6 sm:gap-8 hover:[animation-play-state:paused]">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex flex-none items-center gap-6 sm:gap-8 px-3 sm:px-4">
+                <div className="flex w-56 items-center justify-center gap-3 rounded-2xl bg-card px-6 py-5 shadow-sm border border-border/50 hover:border-red-500/50 hover:shadow-md transition-all">
+                  <FileText size={28} className="text-red-500" /><span className="text-lg font-bold">PDF Documents</span>
+                </div>
+                <div className="flex w-56 items-center justify-center gap-3 rounded-2xl bg-card px-6 py-5 shadow-sm border border-border/50 hover:border-blue-500/50 hover:shadow-md transition-all">
+                  <FileText size={28} className="text-blue-500" /><span className="text-lg font-bold">Word (DOCX)</span>
+                </div>
+                <div className="flex w-56 items-center justify-center gap-3 rounded-2xl bg-card px-6 py-5 shadow-sm border border-border/50 hover:border-green-600/50 hover:shadow-md transition-all">
+                  <Table size={28} className="text-green-600" /><span className="text-lg font-bold">Excel (XLSX)</span>
+                </div>
+                <div className="flex w-56 items-center justify-center gap-3 rounded-2xl bg-card px-6 py-5 shadow-sm border border-border/50 hover:border-orange-500/50 hover:shadow-md transition-all">
+                  <Presentation size={28} className="text-orange-500" /><span className="text-lg font-bold">PowerPoint</span>
+                </div>
+                <div className="flex w-56 items-center justify-center gap-3 rounded-2xl bg-card px-6 py-5 shadow-sm border border-border/50 hover:border-purple-500/50 hover:shadow-md transition-all">
+                  <ImageIcon size={28} className="text-purple-500" /><span className="text-lg font-bold">Images (JPG)</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="px-4 py-24 sm:px-6 lg:px-8">
+      <section className="px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
@@ -187,7 +204,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="border-y border-border bg-muted/20 px-4 py-24 sm:px-6 lg:px-8">
+      <section id="features" className="border-y border-border bg-muted/20 px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
@@ -226,7 +243,7 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="px-4 py-24 sm:px-6 lg:px-8">
+      <section id="pricing" className="px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
@@ -299,7 +316,7 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="border-t border-border bg-muted/10 px-4 py-24 sm:px-6 lg:px-8">
+      <section className="border-t border-border bg-muted/10 px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
@@ -335,8 +352,8 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="border-t border-border px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl rounded-3xl bg-gradient-to-br from-primary to-accent px-6 py-16 text-center shadow-2xl sm:px-16">
+      <section className="border-t border-border px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl rounded-3xl bg-gradient-to-br from-primary to-accent px-6 py-12 text-center shadow-2xl sm:py-16 sm:px-16">
           <h2 className="text-3xl font-extrabold text-white sm:text-5xl">
             Ready to transform your documents?
           </h2>
@@ -396,7 +413,7 @@ export default function HomePage() {
                 <li><Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
+                <li><a href="mailto:daffasven@gmail.com" className="hover:text-primary transition-colors">Contact Us</a></li>
               </ul>
             </div>
           </div>
