@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Bell, Lock, User, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import Link from 'next/link'
@@ -9,6 +9,33 @@ export default function SettingsPage() {
   const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications'>('profile')
   const [saved, setSaved] = useState(false)
+  const [timeLeft, setTimeLeft] = useState<string>('')
+
+  useEffect(() => {
+    if (user?.membership_status === 'premium' && user.subscription_end_date) {
+      const updateCountdown = () => {
+        const end = new Date(user.subscription_end_date!).getTime()
+        const now = new Date().getTime()
+        const diff = end - now
+
+        if (diff <= 0) {
+          setTimeLeft('Expired')
+          return
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+        setTimeLeft(`${days} days, ${hours}h ${minutes}m ${seconds}s`)
+      }
+
+      updateCountdown()
+      const interval = setInterval(updateCountdown, 1000)
+      return () => clearInterval(interval)
+    }
+  }, [user])
 
   const handleSave = () => {
     setSaved(true)
@@ -86,26 +113,40 @@ export default function SettingsPage() {
                   <input
                     type="email"
                     defaultValue={user?.email}
-                    className="w-full rounded-lg border border-input bg-background px-4 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    disabled
+                    className="w-full rounded-lg border border-input bg-muted/50 px-4 py-2 text-foreground"
                   />
+                  <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                 </div>
 
-                {/* User ID */}
+                {/* Membership Status & Countdown */}
                 <div className="space-y-2">
-                  <label className="font-semibold">User ID</label>
-                  <div className="flex items-center rounded-lg border border-border bg-muted/50 px-4 py-3">
-                    <span className="font-mono text-sm text-muted-foreground">{user?.id}</span>
+                  <label className="font-semibold">Membership Status</label>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-border bg-card p-4 gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${user?.membership_status === 'premium' ? 'bg-amber-500/20 text-amber-500' : 'bg-primary/20 text-primary'}`}>
+                        {user?.membership_status === 'premium' ? <Lock size={20} /> : <User size={20} />}
+                      </div>
+                      <div>
+                        <p className="font-medium capitalize">{user?.membership_status || 'Free'} Plan</p>
+                        {user?.membership_status === 'premium' ? (
+                          <p className="text-sm text-amber-500 font-medium">
+                            Expires in: {timeLeft || 'Loading...'}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Limited features</p>
+                        )}
+                      </div>
+                    </div>
+                    {user?.membership_status !== 'premium' && (
+                      <Link
+                        href="/pricing"
+                        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors text-center"
+                      >
+                        Upgrade to Premium
+                      </Link>
+                    )}
                   </div>
-                </div>
-
-                {/* Save Button */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={handleSave}
-                    className="rounded-lg bg-primary px-6 py-2 font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-                  >
-                    {saved ? 'Saved!' : 'Save Changes'}
-                  </button>
                 </div>
               </div>
             </div>

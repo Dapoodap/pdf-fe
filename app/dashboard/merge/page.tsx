@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { FileUp, X, Download, GripVertical, ExternalLink } from 'lucide-react'
 import { mergePdfs, type ManipulationResponse } from '@/lib/api'
 import Link from 'next/link'
-
 import { useAuth } from '@/context/auth-context'
+import { ProcessingProgress } from '@/components/ui/processing-progress'
 
 export default function MergePage() {
   const { user } = useAuth()
@@ -15,7 +15,6 @@ export default function MergePage() {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
@@ -99,18 +98,14 @@ export default function MergePage() {
     setProcessing(true)
     setError(null)
     setResult(null)
-    setProgress(10)
 
     try {
-      setProgress(30)
       const response = await mergePdfs(files)
-      setProgress(100)
       setResult(response)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Merge failed')
     } finally {
       setProcessing(false)
-      setProgress(0)
     }
   }
 
@@ -209,22 +204,7 @@ export default function MergePage() {
           )}
 
           {/* Processing Progress */}
-          {processing && (
-            <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Merging PDFs...</p>
-                  <p className="text-sm text-muted-foreground">{Math.round(progress)}%</p>
-                </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <ProcessingProgress isProcessing={processing} title="Merging PDFs..." />
 
           {/* Success Result */}
           {result && (

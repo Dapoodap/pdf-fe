@@ -128,6 +128,9 @@ export interface UserProfile {
   username: string
   email: string
   membership_status?: string
+  subscription_start_date?: string
+  subscription_end_date?: string
+  total_files_processed?: number
 }
 
 export async function getMeApi(): Promise<UserProfile> {
@@ -272,6 +275,33 @@ export async function lockPdf(
   })
 }
 
+export async function signPdf(
+  file: File,
+  signature: File,
+  page: number,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): Promise<ManipulationResponse> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('signature', signature)
+  formData.append('signature_details', JSON.stringify({
+    page: page,
+    x: x,
+    y: y,
+    width: width,
+    height: height
+  }))
+
+  return apiRequest<ManipulationResponse>('/manipulate/sign', {
+    method: 'POST',
+    body: formData,
+    isFormData: true,
+  })
+}
+
 // ─── PDF Conversion API ─────────────────────────────────────────────────────
 
 export async function pdfToImages(file: File): Promise<ManipulationResponse> {
@@ -384,6 +414,15 @@ export const SERVICE_METADATA: Record<string, ServiceMetadata> = {
     icon: 'Lock',
     color: 'from-rose-500 to-rose-600',
     features: ['Password protection', 'AES encryption', 'Secure sharing', 'Industry standard'],
+  },
+  'sign': {
+    title: 'Sign PDF',
+    category: 'manipulation',
+    href: '/dashboard/sign',
+    publicHref: '/sign',
+    icon: 'PenTool',
+    color: 'from-pink-500 to-pink-600',
+    features: ['Drag & Drop signature', 'Precise positioning', 'Secure embedding', 'Visual preview'],
   },
   'pdf-to-images': {
     title: 'PDF to Images',

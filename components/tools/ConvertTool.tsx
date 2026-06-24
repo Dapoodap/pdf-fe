@@ -13,6 +13,7 @@ import {
 } from '@/lib/api'
 import Link from 'next/link'
 import { useAuth } from '@/context/auth-context'
+import { ProcessingProgress } from '@/components/ui/processing-progress'
 
 const conversionTypes = [
   {
@@ -80,7 +81,6 @@ export function ConvertTool({ isGuest = false, initialType }: ConvertToolProps) 
   const [file, setFile] = useState<File | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
@@ -118,21 +118,19 @@ export function ConvertTool({ isGuest = false, initialType }: ConvertToolProps) 
     setProcessing(true)
     setError(null)
     setResult(null)
-    setProgress(20)
 
     try {
       const converter = converterMap[selectedType]
       if (!converter) throw new Error('Invalid conversion type')
 
-      setProgress(50)
+      if (!converter) throw new Error('Invalid conversion type')
+
       const response = await converter(file)
-      setProgress(100)
       setResult(response)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Conversion failed')
     } finally {
       setProcessing(false)
-      setProgress(0)
     }
   }
 
@@ -243,22 +241,7 @@ export function ConvertTool({ isGuest = false, initialType }: ConvertToolProps) 
           )}
 
           {/* Progress */}
-          {processing && (
-            <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Converting...</p>
-                  <p className="text-sm text-muted-foreground">{Math.round(progress)}%</p>
-                </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <ProcessingProgress isProcessing={processing} title="Converting..." />
 
           {/* Success */}
           {result && (

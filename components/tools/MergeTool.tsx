@@ -5,6 +5,7 @@ import { FileUp, X, Download, GripVertical, ExternalLink } from 'lucide-react'
 import { mergePdfs, type ManipulationResponse } from '@/lib/api'
 import Link from 'next/link'
 import { useAuth } from '@/context/auth-context'
+import { ProcessingProgress } from '@/components/ui/processing-progress'
 
 interface MergeToolProps {
   isGuest?: boolean;
@@ -18,7 +19,6 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
@@ -85,19 +85,15 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
     setProcessing(true)
     setError(null)
     setResult(null)
-    setProgress(20)
 
     try {
-      setProgress(50)
       const rotations = files.map(() => 0)
       const response = await mergePdfs(files, rotations)
-      setProgress(100)
       setResult(response)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Merge failed')
     } finally {
       setProcessing(false)
-      setProgress(0)
     }
   }
 
@@ -187,22 +183,7 @@ export function MergeTool({ isGuest = false }: MergeToolProps) {
           )}
 
           {/* Progress */}
-          {processing && (
-            <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Merging Files...</p>
-                  <p className="text-sm text-muted-foreground">{Math.round(progress)}%</p>
-                </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <ProcessingProgress isProcessing={processing} title="Merging Files..." />
 
           {/* Success Result */}
           {result && (

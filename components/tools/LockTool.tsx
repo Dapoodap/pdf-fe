@@ -5,6 +5,7 @@ import { FileUp, X, Download, Lock, Eye, EyeOff, ExternalLink } from 'lucide-rea
 import { lockPdf, type ManipulationResponse } from '@/lib/api'
 import Link from 'next/link'
 import { useAuth } from '@/context/auth-context'
+import { ProcessingProgress } from '@/components/ui/processing-progress'
 
 interface LockToolProps {
   isGuest?: boolean;
@@ -19,7 +20,6 @@ export function LockTool({ isGuest = false }: LockToolProps) {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
@@ -50,18 +50,14 @@ export function LockTool({ isGuest = false }: LockToolProps) {
     setProcessing(true)
     setError(null)
     setResult(null)
-    setProgress(20)
 
     try {
-      setProgress(50)
       const response = await lockPdf(file, password)
-      setProgress(100)
       setResult(response)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Lock failed')
     } finally {
       setProcessing(false)
-      setProgress(0)
     }
   }
 
@@ -198,22 +194,7 @@ export function LockTool({ isGuest = false }: LockToolProps) {
           )}
 
           {/* Progress */}
-          {processing && (
-            <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Encrypting PDF...</p>
-                  <p className="text-sm text-muted-foreground">{Math.round(progress)}%</p>
-                </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <ProcessingProgress isProcessing={processing} title="Encrypting PDF..." />
 
           {/* Success */}
           {result && (

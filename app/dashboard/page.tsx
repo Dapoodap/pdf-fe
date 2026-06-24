@@ -18,7 +18,8 @@ import {
   Settings2,
   Check,
   X,
-  Loader2
+  Loader2,
+  PenTool
 } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import { useServices } from '@/context/services-context'
@@ -35,6 +36,7 @@ const iconMap: Record<string, any> = {
   Table,
   Presentation,
   FileOutput,
+  PenTool,
 }
 
 export default function DashboardPage() {

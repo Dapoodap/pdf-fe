@@ -13,15 +13,34 @@ import {
   Table,
   Presentation,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  Combine,
+  FileOutput,
+  PenTool
 } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import { useState, useEffect } from 'react'
 import { getPricingPlans, type PricingPlan } from '@/lib/api'
 import { PublicNavbar } from '@/components/public-navbar'
+import { useServices } from '@/context/services-context'
+import { SERVICE_METADATA } from '@/lib/api'
+
+const iconMap: Record<string, any> = {
+  Combine,
+  RotateCw,
+  ArrowUpDown,
+  Lock,
+  Image: ImageIcon,
+  FileText,
+  Table,
+  Presentation,
+  FileOutput,
+  PenTool,
+}
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth()
+  const { services } = useServices()
   const [plans, setPlans] = useState<PricingPlan[]>([])
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -72,72 +91,6 @@ export default function HomePage() {
     }
   ]
 
-  const features = [
-    {
-      icon: FileText,
-      title: 'Merge PDFs',
-      description: 'Combine multiple PDF files into one single document with ease. Perfect for organizing reports.',
-      href: '/merge',
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10'
-    },
-    {
-      icon: FileText,
-      title: 'PDF to Word',
-      description: 'Convert PDF into fully editable DOCX format while preserving text formatting and images.',
-      href: '/pdf-to-word',
-      color: 'text-sky-500',
-      bg: 'bg-sky-500/10'
-    },
-    {
-      icon: Lock,
-      title: 'Protect PDF',
-      description: 'Encrypt your documents with strong AES password protection to keep sensitive data safe.',
-      href: '/lock',
-      color: 'text-rose-500',
-      bg: 'bg-rose-500/10'
-    },
-    {
-      icon: ArrowUpDown,
-      title: 'Reorder Pages',
-      description: 'Rearrange, extract, or remove specific pages from your PDF to create a customized document.',
-      href: '/reorder',
-      color: 'text-violet-500',
-      bg: 'bg-violet-500/10'
-    },
-    {
-      icon: ImageIcon,
-      title: 'PDF to Images',
-      description: 'Extract pages from your PDF into high-quality PNG images instantly.',
-      href: '/pdf-to-images',
-      color: 'text-amber-500',
-      bg: 'bg-amber-500/10'
-    },
-    {
-      icon: Table,
-      title: 'PDF to Excel',
-      description: 'Extract tabular data from PDF files into editable XLSX spreadsheets automatically.',
-      href: '/pdf-to-excel',
-      color: 'text-green-500',
-      bg: 'bg-green-500/10'
-    },
-    {
-      icon: Presentation,
-      title: 'PDF to PPTX',
-      description: 'Turn your PDF presentations back into editable PowerPoint slides flawlessly.',
-      href: '/pdf-to-powerpoint',
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10'
-    },
-    {
-      icon: RotateCw,
-      title: 'Rotate PDF',
-      description: 'Rotate all or specific pages in your document by 90, 180, or 270 degrees.',
-      href: '/rotate',
-      color: 'text-emerald-500',
-      bg: 'bg-emerald-500/10'
-    }
-  ]
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
@@ -246,24 +199,28 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map(({ icon: Icon, title, description, href, color, bg }, i) => (
+            {services.map((service) => {
+              const meta = SERVICE_METADATA[service.name]
+              if (!meta) return null
+              const Icon = iconMap[meta.icon] || FileText
+              return (
               <Link
-                key={i}
-                href={href}
+                key={service.id}
+                href={meta.publicHref}
                 className="group relative flex flex-col justify-between rounded-3xl border border-border bg-card p-8 shadow-sm transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg"
               >
                 <div>
-                  <div className={`mb-6 inline-flex rounded-2xl ${bg} p-4`}>
-                    <Icon size={28} className={color} />
+                  <div className={`mb-6 inline-flex rounded-2xl bg-gradient-to-br ${meta.color} p-4`}>
+                    <Icon size={28} className="text-white" />
                   </div>
-                  <h3 className="mb-3 text-xl font-bold">{title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{description}</p>
+                  <h3 className="mb-3 text-xl font-bold">{meta.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{service.description}</p>
                 </div>
                 <div className="mt-8 font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100 flex items-center gap-1">
                   Try it now <TrendingUp size={16} />
                 </div>
               </Link>
-            ))}
+            )})}
           </div>
         </div>
       </section>

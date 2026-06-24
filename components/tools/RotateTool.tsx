@@ -5,6 +5,7 @@ import { FileUp, X, Download, RotateCw, ExternalLink } from 'lucide-react'
 import { rotatePdf, type ManipulationResponse } from '@/lib/api'
 import Link from 'next/link'
 import { useAuth } from '@/context/auth-context'
+import { ProcessingProgress } from '@/components/ui/processing-progress'
 
 interface RotateToolProps {
   isGuest?: boolean;
@@ -20,7 +21,6 @@ export function RotateTool({ isGuest = false }: RotateToolProps) {
   const [pageMode, setPageMode] = useState<'all' | 'specific'>('all')
   const [pagesInput, setPagesInput] = useState('')
   const [processing, setProcessing] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ManipulationResponse | null>(null)
 
@@ -51,22 +51,19 @@ export function RotateTool({ isGuest = false }: RotateToolProps) {
     setProcessing(true)
     setError(null)
     setResult(null)
-    setProgress(20)
+    setResult(null)
 
     try {
       let pages: number[] | undefined
       if (pageMode === 'specific' && pagesInput.trim()) {
         pages = pagesInput.split(',').map((p) => parseInt(p.trim())).filter((n) => !isNaN(n))
       }
-      setProgress(50)
       const response = await rotatePdf(file, degrees, pages)
-      setProgress(100)
       setResult(response)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Rotation failed')
     } finally {
       setProcessing(false)
-      setProgress(0)
     }
   }
 
@@ -204,22 +201,7 @@ export function RotateTool({ isGuest = false }: RotateToolProps) {
           )}
 
           {/* Progress */}
-          {processing && (
-            <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Rotating PDF...</p>
-                  <p className="text-sm text-muted-foreground">{Math.round(progress)}%</p>
-                </div>
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <ProcessingProgress isProcessing={processing} title="Rotating PDF..." />
 
           {/* Success */}
           {result && (

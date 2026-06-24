@@ -12,7 +12,8 @@ import {
   Presentation,
   FileOutput,
   ArrowRight,
-  Loader2
+  Loader2,
+  PenTool
 } from 'lucide-react'
 import { useServices } from '@/context/services-context'
 import { SERVICE_METADATA } from '@/lib/api'
@@ -27,6 +28,7 @@ const iconMap: Record<string, any> = {
   Table,
   Presentation,
   FileOutput,
+  PenTool,
 }
 
 export default function ServicesPage() {
